@@ -60,7 +60,7 @@ jobs:
       env:
         EC2_IP: ${{ secrets.EC2_IP }}
       run: |
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$EC2_IP "sudo chown -R www-data:www-data /var/www/react-app/build"
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$EC2_IP "chown -R www-data:www-data /var/www/react-app/build"
 
     - name: Install and Configure Nginx
       env:
