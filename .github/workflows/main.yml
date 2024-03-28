@@ -36,37 +36,37 @@ jobs:
       env:
         PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
       run: |
-        echo "$PRIVATE_KEY" > Ohio keypair.pem
-        chmod 600 Ohio keypair.pem
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
 
     - name: Adjust Permissions on EC2
       env:
         EC2_IP: ${{ secrets.EC2_IP }}
       run: |
         eval $(ssh-agent -s)
-        chmod 600 Ohio keypair.pem 
-        ssh-add Ohio keypair.pem
-        ssh -i Ohio keypair.pem ubuntu@3.142.245.57
+        chmod 600 private_key.pem 
+        ssh-add private_key.pem
+        ssh -i private_key.pem ubuntu@3.142.245.57
         sudo mkdir -p /var/www/react-app
-        ssh -o StrictHostKeyChecking=no -i Ohio keypair.pem ubuntu@$EC2_IP "sudo chown -R ubuntu:ubuntu /var/www/react-app"
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$EC2_IP "sudo chown -R ubuntu:ubuntu /var/www/react-app"
 
     - name: Deploy to EC2
       env:
         EC2_IP: ${{ secrets.EC2_IP }}
       run: |
-        scp -o StrictHostKeyChecking=no -i Ohio keypair.pem -r ./build ubuntu@$EC2_IP:/var/www/react-app
+        scp -o StrictHostKeyChecking=no -i private_key.pem -r ./build ubuntu@$EC2_IP:/var/www/react-app
 
     - name: Reset Permissions on EC2
       env:
         EC2_IP: ${{ secrets.EC2_IP }}
       run: |
-        ssh -o StrictHostKeyChecking=no -i Ohio keypair.pem ubuntu@$EC2_IP "sudo chown -R www-data:www-data /var/www/react-app/build"
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$EC2_IP "sudo chown -R www-data:www-data /var/www/react-app/build"
 
     - name: Install and Configure Nginx
       env:
         EC2_IP: ${{ secrets.EC2_IP }}
       run: |
-        ssh -o StrictHostKeyChecking=no -T -i Ohio keypair.pem ubuntu@$EC2_IP <<-EOF
+        ssh -o StrictHostKeyChecking=no -T -i private_key.pem ubuntu@$EC2_IP <<-EOF
           sudo apt update
           sudo apt install -y nginx
           sudo systemctl start nginx
